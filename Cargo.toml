@@ -1,5 +1,5 @@
 [package]
-name = "wasm-test"
+name = "wasm-of-life"
 version = "0.1.0"
 authors = ["Ivan Vologdin <vologdin.nsk@gmail.com>"]
 
