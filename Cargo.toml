@@ -1,0 +1,11 @@
+[package]
+name = "wasm-test"
+version = "0.1.0"
+authors = ["Ivan Vologdin <vologdin.nsk@gmail.com>"]
+
+[dependencies]
+
+[lib]
+path = "src/lib.rs"
+crate-type = ["cdylib"]
+
