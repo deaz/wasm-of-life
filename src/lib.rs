@@ -8,11 +8,12 @@ use std::ffi::CString;
 use std::sync::Mutex;
 
 mod game;
+mod utils;
 
 use game::Game;
 
 lazy_static! {
-    static ref GAME: Mutex<Game> = Mutex::new(Game::new(100, 100));
+    static ref GAME: Mutex<Game> = Mutex::new(Game::new(20, 20));
 }
 
 extern "C" {
