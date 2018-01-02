@@ -61,7 +61,7 @@ fetch('wasm_of_life.wasm')
           start = timestamp;
         }
         const progress = timestamp - start;
-        if (progress > 1000) {
+        if (progress > 20) {
           module.draw(pointer, width, height);
           ctx.putImageData(img, 0, 0);
 
