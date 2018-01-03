@@ -35,10 +35,18 @@ fetch('wasm_of_life.wasm')
   .then(results => {
     module = results.instance.exports;
 
-    const width = 500;
-    const height = 500;
+    const width = Math.max(
+      document.documentElement.clientWidth,
+      window.innerWidth || 0,
+    );
+    const height = Math.max(
+      document.documentElement.clientHeight,
+      window.innerHeight || 0,
+    );
 
     const canvas = document.getElementById('screen');
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
     if (canvas.getContext) {
       const ctx = canvas.getContext('2d');
 
