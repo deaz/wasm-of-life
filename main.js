@@ -23,10 +23,8 @@ let module;
 fetch('wasm_of_life.wasm')
   .then(response => response.arrayBuffer())
   .then(bytes =>
-    // the Rust side needs a cos function
     WebAssembly.instantiate(bytes, {
       env: {
-        floor: Math.floor,
         log: function(ptr) {
           let str = copyCStr(module, ptr);
           console.log(str);
