@@ -70,7 +70,7 @@ pub fn draw(pointer: *mut u8, max_width: usize, max_height: usize) {
         }
     }
 
-    game.next_step();
+    game.update();
 }
 
 fn draw_cell(

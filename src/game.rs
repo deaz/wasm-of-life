@@ -44,7 +44,7 @@ impl Game {
         &self.cells[..]
     }
 
-    pub fn next_step(&mut self) {
+    pub fn update(&mut self) {
         let mut new_cells = self.cells.clone();
         let mut new_cells_to_check = HashSet::new();
         for &(col_num, row_num) in self.cells_to_check.iter() {
