@@ -13,7 +13,7 @@ mod utils;
 use game::Game;
 
 lazy_static! {
-    static ref GAME: Mutex<Game> = Mutex::new(Game::new(100, 100));
+    static ref GAME: Mutex<Game> = Mutex::new(Game::new(10, 10));
 }
 
 extern "C" {
@@ -44,6 +44,11 @@ pub extern "C" fn dealloc_str(ptr: *mut c_char) {
     unsafe {
         let _ = CString::from_raw(ptr);
     }
+}
+
+#[no_mangle]
+pub extern "C" fn init(width: usize, height: usize) {
+    *GAME.lock().unwrap() = Game::new(width, height);
 }
 
 // the Javascript side passes a pointer to a buffer, the size of the corresponding canvas
