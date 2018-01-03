@@ -52,7 +52,7 @@ fetch('wasm_of_life.wasm')
         pointer,
         byteSize,
       );
-      const img = new ImageData(buffer, width, height);
+      let img = new ImageData(buffer, width, height);
 
       let start = null;
 
@@ -63,6 +63,17 @@ fetch('wasm_of_life.wasm')
         const progress = timestamp - start;
         if (progress > 20) {
           module.draw(pointer, width, height);
+
+          // Hack: buffer becomes empty sometimes
+          if (buffer.length === 0) {
+            const buffer = new Uint8ClampedArray(
+              module.memory.buffer,
+              pointer,
+              byteSize,
+            );
+            img = new ImageData(buffer, width, height);
+          }
+
           ctx.putImageData(img, 0, 0);
 
           start = timestamp;
