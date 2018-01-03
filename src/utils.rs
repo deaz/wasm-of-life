@@ -1,8 +1,8 @@
 use std::mem;
 
 // Modulo, not remainder. modulo(-1, 10) -> 9
-pub fn modulo(a: isize, b: isize) -> usize {
-    (((a % b) + b) % b) as usize
+pub fn modulo(a: i16, b: i16) -> u16 {
+    (((a % b) + b) % b) as u16
 }
 
 extern "C" {
