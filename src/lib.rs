@@ -13,7 +13,7 @@ mod utils;
 use game::Game;
 
 lazy_static! {
-    static ref GAME: Mutex<Game> = Mutex::new(Game::new(20, 20));
+    static ref GAME: Mutex<Game> = Mutex::new(Game::new(100, 100));
 }
 
 extern "C" {
@@ -29,7 +29,7 @@ pub extern "C" fn alloc(size: usize) -> *mut c_void {
 
     let ptr = buf.as_mut_ptr();
     mem::forget(buf);
-    return ptr as *mut c_void;
+    ptr as *mut c_void
 }
 
 #[no_mangle]
