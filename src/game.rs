@@ -5,15 +5,15 @@ use self::rand::{Rng, SeedableRng, StdRng};
 use super::utils::modulo;
 
 pub struct Game {
-    pub width: u16,
-    pub height: u16,
+    pub width: usize,
+    pub height: usize,
     cells: Vec<Vec<bool>>,
-    cells_to_check: HashSet<(u16, u16)>,
+    cells_to_check: HashSet<(usize, usize)>,
 }
 
 impl Game {
-    pub fn new(width: u16, height: u16) -> Self {
-        let mut cells = vec![vec![false; height as usize]; width as usize];
+    pub fn new(width: usize, height: usize) -> Self {
+        let mut cells = vec![vec![false; height]; width];
         let mut cells_to_check = HashSet::new();
         // wasm doesn't have OsRng so seed is hardcoded
         let seed = [42];
@@ -21,7 +21,7 @@ impl Game {
         for (col_num, column) in cells.iter_mut().enumerate() {
             for (row_num, cell) in (*column).iter_mut().enumerate() {
                 *cell = rng.gen();
-                cells_to_check.insert((col_num as u16, row_num as u16));
+                cells_to_check.insert((col_num, row_num));
             }
         }
 
@@ -49,12 +49,11 @@ impl Game {
         let mut new_cells_to_check = HashSet::new();
         for &(col_num, row_num) in self.cells_to_check.iter() {
             let count = self.count_neighbour_cells(col_num, row_num);
-            let (x, y) = (col_num as usize, row_num as usize);
-            let cell = self.cells[x][y];
+            let cell = self.cells[col_num][row_num];
             if cell && (count < 2 || count > 3) {
-                new_cells[x][y] = false;
+                new_cells[col_num][row_num] = false;
             } else if !cell && count == 3 {
-                new_cells[x][y] = true;
+                new_cells[col_num][row_num] = true;
             } else {
                 continue;
             }
@@ -67,25 +66,27 @@ impl Game {
         self.cells_to_check = new_cells_to_check;
     }
 
-    fn count_neighbour_cells(&self, col_num: u16, row_num: u16) -> u8 {
+    fn count_neighbour_cells(&self, col_num: usize, row_num: usize) -> u8 {
         let mut count = 0u8;
         let neighbours = self.get_neighbours(col_num, row_num);
         for &(x, y) in neighbours.iter() {
-            if self.cells[x as usize][y as usize] {
+            if self.cells[x % self.width][y % self.height] {
                 count += 1;
             }
         }
         count
     }
 
-    fn get_neighbours(&self, col_num: u16, row_num: u16) -> [(u16, u16); 8] {
-        let mut neighbours = [(0u16, 0u16); 8];
+    fn get_neighbours(&self, col_num: usize, row_num: usize) -> [(usize, usize); 8] {
+        let mut neighbours = [(0usize, 0usize); 8];
         let mut index = 0;
-        for i in col_num as i16 - 1..col_num as i16 + 2 {
-            for j in row_num as i16 - 1..row_num as i16 + 2 {
-                if col_num as i16 != i || row_num as i16 != j {
-                    neighbours[index] =
-                        (modulo(i, self.width as i16), modulo(j, self.height as i16));
+        for i in col_num as isize - 1..col_num as isize + 2 {
+            for j in row_num as isize - 1..row_num as isize + 2 {
+                if col_num as isize != i || row_num as isize != j {
+                    neighbours[index] = (
+                        modulo(i, self.width as isize),
+                        modulo(j, self.height as isize),
+                    );
                     index += 1;
                 }
             }

@@ -44,15 +44,15 @@ pub extern "C" fn dealloc_str(ptr: *mut c_char) {
 
 #[no_mangle]
 pub extern "C" fn init(width: usize, height: usize) {
-    *GAME.lock().unwrap() = Game::new(width as u16, height as u16);
+    *GAME.lock().unwrap() = Game::new(width, height);
 }
 
 // the Javascript side passes a pointer to a buffer, the size of the corresponding canvas
 // and the current timestamp
 #[no_mangle]
-pub fn draw(pointer: *mut u8, max_width: u16, max_height: u16) {
+pub fn draw(pointer: *mut u8, max_width: usize, max_height: usize) {
     // pixels are stored in RGBA, so each pixel is 4 bytes
-    let byte_size = max_width as usize * max_height as usize * 4;
+    let byte_size = max_width * max_height * 4;
     let buffer = unsafe { slice::from_raw_parts_mut(pointer, byte_size) };
 
     let game: &mut Game = &mut GAME.lock().unwrap();
@@ -63,8 +63,8 @@ pub fn draw(pointer: *mut u8, max_width: u16, max_height: u16) {
         let cells = game.get_cells();
         for (col_num, column) in cells.iter().enumerate() {
             for (row_num, &cell) in column.iter().enumerate() {
-                let x = col_num as u16 * cell_width;
-                let y = row_num as u16 * cell_height;
+                let x = col_num * cell_width;
+                let y = row_num * cell_height;
                 draw_cell(buffer, max_width, x, y, cell_width, cell_height, cell);
             }
         }
@@ -75,16 +75,16 @@ pub fn draw(pointer: *mut u8, max_width: u16, max_height: u16) {
 
 fn draw_cell(
     buffer: &mut [u8],
-    canvas_width: u16,
-    x: u16,
-    y: u16,
-    width: u16,
-    height: u16,
+    canvas_width: usize,
+    x: usize,
+    y: usize,
+    width: usize,
+    height: usize,
     cell: bool,
 ) {
     for i in x..(x + width) {
         for j in y..(y + height) {
-            let offset = (j as usize * canvas_width as usize + i as usize) * 4;
+            let offset = (j * canvas_width + i) * 4;
             buffer[offset] = if cell { 0 } else { 255 };
             buffer[offset + 1] = if cell { 0 } else { 255 };
             buffer[offset + 2] = if cell { 0 } else { 255 };

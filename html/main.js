@@ -56,7 +56,7 @@ fetch('wasm_of_life.wasm')
       const byteSize = width * height * 4;
       const pointer = module.alloc(byteSize);
 
-      let buffer = new Uint8ClampedArray(
+      const buffer = new Uint8ClampedArray(
         module.memory.buffer,
         pointer,
         byteSize,
@@ -80,7 +80,7 @@ fetch('wasm_of_life.wasm')
 
           // Hack: buffer becomes empty sometimes
           if (buffer.length === 0) {
-            buffer = new Uint8ClampedArray(
+            const buffer = new Uint8ClampedArray(
               module.memory.buffer,
               pointer,
               byteSize,
