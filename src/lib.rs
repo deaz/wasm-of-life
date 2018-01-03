@@ -16,16 +16,12 @@ lazy_static! {
     static ref GAME: Mutex<Game> = Mutex::new(Game::new(10, 10));
 }
 
-extern "C" {
-    fn log(ptr: *const u8);
-}
-
 // In order to work with the memory we expose (de)allocation methods
 #[no_mangle]
 pub extern "C" fn alloc(size: usize) -> *mut c_void {
     let mut buf = Vec::with_capacity(size);
 
-    safe_log("Allocated!");
+    utils::safe_log("Allocated!");
 
     let ptr = buf.as_mut_ptr();
     mem::forget(buf);
@@ -69,7 +65,7 @@ pub fn draw(pointer: *mut u8, max_width: usize, max_height: usize) {
             for (row_num, &cell) in column.iter().enumerate() {
                 let x = col_num * cell_width;
                 let y = row_num * cell_height;
-                draw_rect(buffer, max_width, x, y, cell_width, cell_height, cell);
+                draw_cell(buffer, max_width, x, y, cell_width, cell_height, cell);
             }
         }
     }
@@ -77,7 +73,7 @@ pub fn draw(pointer: *mut u8, max_width: usize, max_height: usize) {
     game.next_step();
 }
 
-fn draw_rect(
+fn draw_cell(
     buffer: &mut [u8],
     canvas_width: usize,
     x: usize,
@@ -94,15 +90,5 @@ fn draw_rect(
             buffer[offset + 2] = if cell { 0 } else { 255 };
             buffer[offset + 3] = 255; // alpha
         }
-    }
-}
-
-fn safe_log(text: &str) {
-    let s = String::from(text);
-    let p = s.as_ptr();
-    // Do not deallocate on rust side. `dealloc_str` should be called from JS
-    mem::forget(s);
-    unsafe {
-        log(p as *const u8);
     }
 }
