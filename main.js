@@ -35,6 +35,8 @@ fetch('wasm_of_life.wasm')
   .then(results => {
     module = results.instance.exports;
 
+    const cell_size = 5;
+
     const width = Math.max(
       document.documentElement.clientWidth,
       window.innerWidth || 0,
@@ -45,8 +47,9 @@ fetch('wasm_of_life.wasm')
     );
 
     const canvas = document.getElementById('screen');
-    canvas.style.width = `${width}px`;
-    canvas.style.height = `${height}px`;
+    canvas.width = width;
+    canvas.height = height;
+
     if (canvas.getContext) {
       const ctx = canvas.getContext('2d');
 
@@ -59,6 +62,11 @@ fetch('wasm_of_life.wasm')
         byteSize,
       );
       let img = new ImageData(buffer, width, height);
+
+      module.init(
+        Math.floor(width / cell_size),
+        Math.floor(height / cell_size),
+      );
 
       let start = null;
 
