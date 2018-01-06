@@ -79,7 +79,7 @@ fetch('wasm_of_life.wasm')
 
           // Hack: buffer becomes empty sometimes
           if (buffer.length === 0) {
-            // Look like there is memory here but i don't know where
+            // Look like there is memory leak here but i don't know where
             // and how to workaround it
 
             console.log('AAAA');
