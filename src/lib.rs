@@ -22,6 +22,7 @@ lazy_static! {
 /// Initializes game with given field size.
 pub extern "C" fn init(width: usize, height: usize) {
     *GAME.lock().unwrap() = Game::new(width, height);
+    utils::log("Initialized!");
 }
 
 /// Method for string deallocation on JS side.

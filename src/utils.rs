@@ -1,4 +1,5 @@
 use std::mem;
+use std::ffi::CString;
 
 use super::browser;
 
@@ -14,9 +15,10 @@ pub fn modulo(a: isize, b: isize) -> usize {
     (((a % b) + b) % b) as usize
 }
 
+/// Safe wrapper for `log` function.
 /// Logs `text` to browser console.
 pub fn log(text: &str) {
-    let s = String::from(text);
+    let s = CString::new(text).unwrap();
     let p = s.as_ptr();
     // Do not deallocate on rust side. `dealloc_str` should be called from JS
     mem::forget(s);
