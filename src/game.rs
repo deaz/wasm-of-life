@@ -112,3 +112,42 @@ impl Game {
         neighbours
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn glider() {
+        // *____
+        // _**__
+        // **___
+        // _____
+        // _____
+        let glider_1 = vec![
+            vec![true, false, true, false, false],
+            vec![false, true, true, false, false],
+            vec![false, true, false, false, false],
+            vec![false, false, false, false, false],
+            vec![false, false, false, false, false],
+        ];
+
+        // _*___
+        // __*__
+        // ***__
+        // _____
+        // _____
+        let glider_2 = vec![
+            vec![false, false, true, false, false],
+            vec![true, false, true, false, false],
+            vec![false, true, true, false, false],
+            vec![false, false, false, false, false],
+            vec![false, false, false, false, false],
+        ];
+
+        let mut game = Game::new(5, 5);
+        game.cells = glider_1;
+        game.update();
+        assert_eq!(game.cells, glider_2);
+    }
+}
