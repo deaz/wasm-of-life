@@ -53,6 +53,11 @@ fetch('wasm_of_life.wasm')
     if (canvas.getContext) {
       let ctx = canvas.getContext('2d');
 
+      module.init(
+        Math.floor(width / cell_size),
+        Math.floor(height / cell_size),
+      );
+
       const byteSize = width * height * 4;
       const pointer = module.alloc(byteSize);
       let buffer = new Uint8ClampedArray(
@@ -61,11 +66,6 @@ fetch('wasm_of_life.wasm')
         byteSize,
       );
       let img = new ImageData(buffer, width, height);
-
-      module.init(
-        Math.floor(width / cell_size),
-        Math.floor(height / cell_size),
-      );
 
       let start = null;
 
@@ -81,6 +81,8 @@ fetch('wasm_of_life.wasm')
           if (buffer.length === 0) {
             // Look like there is memory here but i don't know where
             // and how to workaround it
+
+            console.log('AAAA');
 
             canvas.remove();
             canvas = document.createElement('canvas');
