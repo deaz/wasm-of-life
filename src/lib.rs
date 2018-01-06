@@ -1,6 +1,7 @@
 #[macro_use]
 extern crate lazy_static;
 
+use std::mem;
 use std::slice;
 use std::os::raw::{c_char, c_void};
 use std::ffi::CString;
@@ -13,18 +14,17 @@ use game::Game;
 
 lazy_static! {
     static ref GAME: Mutex<Game> = Mutex::new(Game::new(10, 10));
-    static ref BUFFER: Mutex<Vec<u8>> = Mutex::new(Vec::new());
 }
 
 // In order to work with the memory we expose (de)allocation methods
 #[no_mangle]
 pub extern "C" fn alloc(size: usize) -> *mut c_void {
-    let buf: &mut Vec<_> = &mut BUFFER.lock().unwrap();
-    *buf = Vec::with_capacity(size);
+    let mut buf = Vec::with_capacity(size);
 
     utils::safe_log(&format!("Allocated {} bytes\n", size));
 
     let ptr = buf.as_mut_ptr();
+    mem::forget(buf);
     ptr as *mut c_void
 }
 
