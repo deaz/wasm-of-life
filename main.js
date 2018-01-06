@@ -46,12 +46,12 @@ fetch('wasm_of_life.wasm')
       window.innerHeight || 0,
     );
 
-    const canvas = document.getElementById('screen');
+    let canvas = document.getElementById('screen');
     canvas.width = width;
     canvas.height = height;
 
     if (canvas.getContext) {
-      const ctx = canvas.getContext('2d');
+      let ctx = canvas.getContext('2d');
 
       const byteSize = width * height * 4;
       const pointer = module.alloc(byteSize);
@@ -79,10 +79,16 @@ fetch('wasm_of_life.wasm')
 
           // Hack: buffer becomes empty sometimes
           if (buffer.length === 0) {
-            // Looks like there is memory leak without this lines
-            const imgData = ctx.getImageData(0, 0, width, height);
-            delete imgData.data.buffer;
-            delete imgData.data;
+            // Look like there is memory here but i don't know where
+            // and how to workaround it
+
+            canvas.remove();
+            canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const body = document.getElementsByTagName('body')[0];
+            body.appendChild(canvas);
+            ctx = canvas.getContext('2d');
 
             buffer = new Uint8ClampedArray(
               module.memory.buffer,
