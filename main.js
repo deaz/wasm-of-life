@@ -18,6 +18,9 @@ function copyCStr(module, ptr) {
   return buffer_as_utf8;
 }
 
+// Cell size in pixels.
+const CELL_SIZE = 5;
+
 let module;
 let canvasContext;
 
@@ -48,8 +51,6 @@ fetch('wasm_of_life.wasm')
   .then(results => {
     module = results.instance.exports;
 
-    const cell_size = 5;
-
     const width = Math.max(
       document.documentElement.clientWidth,
       window.innerWidth || 0,
@@ -67,8 +68,8 @@ fetch('wasm_of_life.wasm')
       canvasContext = canvas.getContext('2d');
 
       module.init(
-        Math.floor(width / cell_size),
-        Math.floor(height / cell_size),
+        Math.floor(width / CELL_SIZE),
+        Math.floor(height / CELL_SIZE),
       );
 
       let start = null;
