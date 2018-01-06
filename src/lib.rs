@@ -25,7 +25,7 @@ extern "C" {
 pub extern "C" fn alloc(size: usize) -> *mut c_void {
     let mut buf = Vec::with_capacity(size);
 
-    utils::safe_log("Allocated!");
+    utils::safe_log(&format!("Allocated {} bytes\n", size));
 
     let ptr = buf.as_mut_ptr();
     mem::forget(buf);
@@ -52,32 +52,24 @@ pub extern "C" fn init(width: usize, height: usize) {
 }
 
 #[no_mangle]
-pub fn draw(canvas_width: usize, canvas_height: usize) {
-    let game: &mut Game = &mut GAME.lock().unwrap();
-    unsafe {
-        clearAll();
-    }
-    {
-        // Separate scope for borrow of `game` because of mutable borrow for `update()` below
-        let cell_width = canvas_width / game.width;
-        let cell_height = canvas_height / game.height;
-        let cells = game.get_cells();
-        for (col_num, column) in cells.iter().enumerate() {
-            for (row_num, &cell) in column.iter().enumerate() {
-                let x = col_num * cell_width;
-                let y = row_num * cell_height;
-                draw_cell(
-                    x as f64,
-                    y as f64,
-                    cell_width as f64,
-                    cell_height as f64,
-                    cell,
-                );
-            }
-        }
-    }
+pub fn draw(pointer: *mut u8, canvas_width: usize, canvas_height: usize) {
+    // pixels are stored in RGBA, so each pixel is 4 bytes
+    let byte_size = canvas_width * canvas_height * 4;
+    let buffer = unsafe { slice::from_raw_parts_mut(pointer, byte_size) };
 
-    game.update();
+    let game: &mut Game = &mut GAME.lock().unwrap();
+
+    let updated = game.update();
+
+    let cell_width = canvas_width / game.width;
+    let cell_height = canvas_height / game.height;
+    let cells = game.get_cells();
+    for (col_num, row_num) in updated {
+        let x = col_num * cell_width;
+        let y = row_num * cell_height;
+        let cell = cells[col_num][row_num];
+        draw_cell(buffer, canvas_width, x, y, cell_width, cell_height, cell);
+    }
 }
 
 fn draw_cell(x: f64, y: f64, width: f64, height: f64, cell: bool) {

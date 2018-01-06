@@ -64,7 +64,7 @@ fetch('wasm_of_life.wasm')
       window.innerHeight || 0,
     );
 
-    const canvas = document.getElementById('screen');
+    let canvas = document.getElementById('screen');
     canvas.width = width;
     canvas.height = height;
 
