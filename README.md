@@ -1,6 +1,6 @@
 # wasm-of-life
 
-Game of life implemented using WASM and Rust.
+[Game of life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life) implemented using WASM and Rust.
 
 Demo: https://deaz.github.io/wasm-of-life/
 
