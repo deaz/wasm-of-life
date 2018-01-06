@@ -19,6 +19,7 @@ function copyCStr(module, ptr) {
 }
 
 let module;
+let canvasContext;
 
 fetch('wasm_of_life.wasm')
   .then(response => response.arrayBuffer())
@@ -28,6 +29,23 @@ fetch('wasm_of_life.wasm')
         log: function(ptr) {
           let str = copyCStr(module, ptr);
           console.log(str);
+        },
+        drawBlackRect: function(x, y, width, height) {
+          if (canvasContext) {
+            canvasContext.fillStyle = '#000';
+            canvasContext.fillRect(x, y, width, height);
+          }
+        },
+        clearAll: function() {
+          if (canvasContext) {
+            canvasContext.fillStyle = '#fff';
+            canvasContext.fillRect(
+              0,
+              0,
+              canvasContext.canvas.clientWidth,
+              canvasContext.canvas.clientHeight,
+            );
+          }
         },
       },
     }),
@@ -51,16 +69,7 @@ fetch('wasm_of_life.wasm')
     canvas.height = height;
 
     if (canvas.getContext) {
-      const ctx = canvas.getContext('2d');
-
-      const byteSize = width * height * 4;
-      const pointer = module.alloc(byteSize);
-      let buffer = new Uint8ClampedArray(
-        module.memory.buffer,
-        pointer,
-        byteSize,
-      );
-      let img = new ImageData(buffer, width, height);
+      canvasContext = canvas.getContext('2d');
 
       module.init(
         Math.floor(width / cell_size),
@@ -75,25 +84,7 @@ fetch('wasm_of_life.wasm')
         }
         const progress = timestamp - start;
         if (progress > 20) {
-          module.draw(pointer, width, height);
-
-          // Hack: buffer becomes empty sometimes
-          if (buffer.length === 0) {
-            // Looks like there is memory leak without this lines
-            const imgData = ctx.getImageData(0, 0, width, height);
-            delete imgData.data.buffer;
-            delete imgData.data;
-
-            buffer = new Uint8ClampedArray(
-              module.memory.buffer,
-              pointer,
-              byteSize,
-            );
-            img = new ImageData(buffer, width, height);
-          }
-
-          ctx.putImageData(img, 0, 0);
-
+          module.draw(width, height);
           start = timestamp;
         }
         window.requestAnimationFrame(step);
