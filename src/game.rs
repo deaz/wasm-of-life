@@ -1,17 +1,25 @@
+//! Module with "game of life" logic.
+
 extern crate rand;
 
 use std::collections::HashSet;
 use self::rand::{Rng, SeedableRng, StdRng};
 use super::utils::modulo;
 
+/// Struct with game state.
 pub struct Game {
+    /// Field width in cells.
     pub width: usize,
+    /// Field height in cells.
     pub height: usize,
+    /// Field cells. `true` - cell is alive, `false` - cell is dead.
     cells: Vec<Vec<bool>>,
+    /// Cells that need to be checked on next update.
     cells_to_check: HashSet<(usize, usize)>,
 }
 
 impl Game {
+    /// Creates new game field with given size.
     pub fn new(width: usize, height: usize) -> Self {
         let mut cells = vec![vec![false; height]; width];
         let mut cells_to_check = HashSet::new();
@@ -40,11 +48,12 @@ impl Game {
         }
     }
 
+    /// Returns slice with field cells.
     pub fn get_cells(&self) -> &[Vec<bool>] {
         &self.cells[..]
     }
 
-    // Returns updated cells
+    /// Updates field state and returns updated cells.
     pub fn update(&mut self) -> Vec<(usize, usize)> {
         let mut new_cells = self.cells.clone();
 
