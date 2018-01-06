@@ -16,8 +16,8 @@ lazy_static! {
 }
 
 extern "C" {
-    fn drawBlackRect(x: f64, y: f64, width: f64, height: f64);
-    fn clearAll();
+    fn drawBlackRect(x: usize, y: usize, width: usize, height: usize);
+    fn drawWhiteRect(x: usize, y: usize, width: usize, height: usize);
 }
 
 // In order to work with the memory we expose (de)allocation methods
@@ -52,11 +52,7 @@ pub extern "C" fn init(width: usize, height: usize) {
 }
 
 #[no_mangle]
-pub fn draw(pointer: *mut u8, canvas_width: usize, canvas_height: usize) {
-    // pixels are stored in RGBA, so each pixel is 4 bytes
-    let byte_size = canvas_width * canvas_height * 4;
-    let buffer = unsafe { slice::from_raw_parts_mut(pointer, byte_size) };
-
+pub fn draw(canvas_width: usize, canvas_height: usize) {
     let game: &mut Game = &mut GAME.lock().unwrap();
 
     let updated = game.update();
@@ -68,14 +64,16 @@ pub fn draw(pointer: *mut u8, canvas_width: usize, canvas_height: usize) {
         let x = col_num * cell_width;
         let y = row_num * cell_height;
         let cell = cells[col_num][row_num];
-        draw_cell(buffer, canvas_width, x, y, cell_width, cell_height, cell);
+        draw_cell(x, y, cell_width, cell_height, cell);
     }
 }
 
-fn draw_cell(x: f64, y: f64, width: f64, height: f64, cell: bool) {
+fn draw_cell(x: usize, y: usize, width: usize, height: usize, cell: bool) {
     unsafe {
         if cell {
             drawBlackRect(x, y, width, height);
+        } else {
+            drawWhiteRect(x, y, width, height);
         }
     }
 }

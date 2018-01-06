@@ -36,15 +36,10 @@ fetch('wasm_of_life.wasm')
             canvasContext.fillRect(x, y, width, height);
           }
         },
-        clearAll: function() {
+        drawWhiteRect: function(x, y, width, height) {
           if (canvasContext) {
             canvasContext.fillStyle = '#fff';
-            canvasContext.fillRect(
-              0,
-              0,
-              canvasContext.canvas.clientWidth,
-              canvasContext.canvas.clientHeight,
-            );
+            canvasContext.fillRect(x, y, width, height);
           }
         },
       },
