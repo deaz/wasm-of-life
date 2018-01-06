@@ -1,7 +1,6 @@
 #[macro_use]
 extern crate lazy_static;
 
-use std::mem;
 use std::slice;
 use std::os::raw::{c_char, c_void};
 use std::ffi::CString;
@@ -14,17 +13,18 @@ use game::Game;
 
 lazy_static! {
     static ref GAME: Mutex<Game> = Mutex::new(Game::new(10, 10));
+    static ref BUFFER: Mutex<Vec<u8>> = Mutex::new(Vec::new());
 }
 
 // In order to work with the memory we expose (de)allocation methods
 #[no_mangle]
 pub extern "C" fn alloc(size: usize) -> *mut c_void {
-    let mut buf = Vec::with_capacity(size);
+    let buf: &mut Vec<_> = &mut BUFFER.lock().unwrap();
+    *buf = Vec::with_capacity(size);
 
-    utils::safe_log("Allocated!");
+    utils::safe_log(&format!("Allocated {} bytes\n", size));
 
     let ptr = buf.as_mut_ptr();
-    mem::forget(buf);
     ptr as *mut c_void
 }
 
@@ -50,23 +50,23 @@ pub extern "C" fn init(width: usize, height: usize) {
 // the Javascript side passes a pointer to a buffer, the size of the corresponding canvas
 // and the current timestamp
 #[no_mangle]
-pub fn draw(pointer: *mut u8, max_width: usize, max_height: usize) {
+pub fn draw(pointer: *mut u8, canvas_width: usize, canvas_height: usize) {
     // pixels are stored in RGBA, so each pixel is 4 bytes
-    let byte_size = max_width * max_height * 4;
+    let byte_size = canvas_width * canvas_height * 4;
     let buffer = unsafe { slice::from_raw_parts_mut(pointer, byte_size) };
 
     let game: &mut Game = &mut GAME.lock().unwrap();
 
     let updated = game.update();
 
-    let cell_width = max_width / game.width;
-    let cell_height = max_height / game.height;
+    let cell_width = canvas_width / game.width;
+    let cell_height = canvas_height / game.height;
     let cells = game.get_cells();
     for (col_num, row_num) in updated {
         let x = col_num * cell_width;
         let y = row_num * cell_height;
         let cell = cells[col_num][row_num];
-        draw_cell(buffer, max_width, x, y, cell_width, cell_height, cell);
+        draw_cell(buffer, canvas_width, x, y, cell_width, cell_height, cell);
     }
 }
 
