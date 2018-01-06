@@ -56,21 +56,18 @@ pub fn draw(pointer: *mut u8, max_width: usize, max_height: usize) {
     let buffer = unsafe { slice::from_raw_parts_mut(pointer, byte_size) };
 
     let game: &mut Game = &mut GAME.lock().unwrap();
-    {
-        // Separate scope for borrow of `game` because of mutable borrow for `next_step()` below
-        let cell_width = max_width / game.width;
-        let cell_height = max_height / game.height;
-        let cells = game.get_cells();
-        for (col_num, column) in cells.iter().enumerate() {
-            for (row_num, &cell) in column.iter().enumerate() {
-                let x = col_num * cell_width;
-                let y = row_num * cell_height;
-                draw_cell(buffer, max_width, x, y, cell_width, cell_height, cell);
-            }
-        }
-    }
 
-    game.update();
+    let updated = game.update();
+
+    let cell_width = max_width / game.width;
+    let cell_height = max_height / game.height;
+    let cells = game.get_cells();
+    for (col_num, row_num) in updated {
+        let x = col_num * cell_width;
+        let y = row_num * cell_height;
+        let cell = cells[col_num][row_num];
+        draw_cell(buffer, max_width, x, y, cell_width, cell_height, cell);
+    }
 }
 
 fn draw_cell(

@@ -44,9 +44,11 @@ impl Game {
         &self.cells[..]
     }
 
-    pub fn update(&mut self) {
+    // Returns updated cells
+    pub fn update(&mut self) -> Vec<(usize, usize)> {
         let mut new_cells = self.cells.clone();
         let mut new_cells_to_check = HashSet::new();
+        let mut updated = Vec::new();
         for &(col_num, row_num) in self.cells_to_check.iter() {
             let count = self.count_neighbour_cells(col_num, row_num);
             let cell = self.cells[col_num][row_num];
@@ -57,13 +59,18 @@ impl Game {
             } else {
                 continue;
             }
+
             new_cells_to_check.insert((col_num, row_num));
             for &point in self.get_neighbours(col_num, row_num).iter() {
                 new_cells_to_check.insert(point);
             }
+
+            updated.push((col_num, row_num));
         }
         self.cells = new_cells;
         self.cells_to_check = new_cells_to_check;
+
+        updated
     }
 
     fn count_neighbour_cells(&self, col_num: usize, row_num: usize) -> u8 {
