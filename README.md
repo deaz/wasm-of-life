@@ -4,6 +4,8 @@
 
 Demo: https://deaz.github.io/wasm-of-life/
 
+![Demo](./game-of-life.gif)
+
 ## Build
 
 * Install `nightly` rust toolchain and add `wasm32-unknown-unknown` target
