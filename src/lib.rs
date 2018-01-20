@@ -18,8 +18,8 @@ lazy_static! {
     static ref GAME: Mutex<Game> = Mutex::new(Game::new(10, 10));
 }
 
-#[no_mangle]
 /// Initializes game with given field size.
+#[no_mangle]
 pub extern "C" fn init(width: usize, height: usize) {
     *GAME.lock().unwrap() = Game::new(width, height);
     utils::log("Initialized!");
