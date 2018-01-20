@@ -33,8 +33,8 @@ pub extern "C" fn dealloc_str(ptr: *mut c_char) {
     }
 }
 
-#[no_mangle]
 /// Draws game field and updates game field state.
+#[no_mangle]
 pub fn draw(canvas_width: usize, canvas_height: usize) {
     let game: &mut Game = &mut GAME.lock().unwrap();
 
